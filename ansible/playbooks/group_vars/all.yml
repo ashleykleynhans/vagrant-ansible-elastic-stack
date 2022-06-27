@@ -1,3 +1,41 @@
 ---
 kibana_admin_user: kibanaadmin
 kibana_admin_password: changeit
+kibana_server: 10.10.10.21
+
+logstash_hosts:
+  - 10.10.10.21:5044
+
+filebeat_reload_enabled: 'false'
+filebeat_reload_period: '10s'
+filebeat_inputs:
+  - name: app error logs
+    type: 'log'
+    paths:
+      - /var/log/app-error.log
+    fields:
+      indexname: 'app-error_logs'
+    fields_under_root: 'true'
+    enabled: 'true'
+    multiline_match: 'after'
+    multiline_negate: 'true'
+    multiline_pattern: '^.*(ERROR|DEBUG|INFO|WARNING|CRITICAL) :'
+  - name: app logs
+    type: 'log'
+    paths:
+      - /var/log/app.log
+    fields:
+      indexname: 'app_logs'
+    fields_under_root: 'true'
+    enabled: 'true'
+    multiline_match: 'after'
+    multiline_negate: 'true'
+    multiline_pattern: '^.*(ERROR|DEBUG|INFO|WARNING|CRITICAL) :'
+filebeat_output_logstash:
+  hosts: '{{ logstash_hosts }}'
+  worker: 2
+filebeat_setup_kibana:
+  host: '{{ kibana_server }}:5601'
+filebeat_setup_template_settings:
+  index_number_of_shards: 1
+filebeat_logging_level: 'debug'

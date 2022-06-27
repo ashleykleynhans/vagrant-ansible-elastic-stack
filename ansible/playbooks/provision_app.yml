@@ -1,0 +1,31 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Include task to install packages that enable apt over HTTPS
+      ansible.builtin.include_tasks: includes/apt_over_https.yml
+
+    - name: Include task to install useful packages
+      ansible.builtin.include_tasks: includes/install_useful_packages.yml
+
+    - name: Include task to install filebeat
+      ansible.builtin.include_tasks: includes/install_filebeat.yml
+
+    - name: Copy dummy logging app to /usr/local/bin/logger.py
+      ansible.builtin.copy:
+        src: ../files/logger.py
+        dest: /usr/local/bin/logger.py
+        mode: 0755
+
+    - name: Generate some dummy logs
+      ansible.builtin.command: >-
+        python3 /usr/local/bin/logger.py
+
+  handlers:
+    - name: restart filebeat
+      ansible.builtin.systemd:
+        name: filebeat
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

@@ -1,0 +1,54 @@
+---
+# {{ ansible_managed }}
+
+filebeat.config.modules:
+  path: "${path.config}/modules.d/*.yml"
+  reload.enabled: {{ filebeat_reload_enabled }}
+  reload.period: {{ filebeat_reload_period }}
+
+filebeat.inputs:
+{% for item in filebeat_inputs %}
+  - enabled: {{ item.enabled }}
+    multiline.match: {{ item.multiline_match }}
+    multiline.negate: {{ item.multiline_negate }}
+    multiline.pattern: "{{ item.multiline_pattern }}"
+    paths:
+{% if item.paths is defined %}
+{% for path in item.paths %}
+      - {{ path }}
+{% endfor %}
+{% endif %}
+    type: {{ item.type }}
+{% if item.fields is defined %}
+    fields:
+      indexname: {{ item.fields.indexname }}
+{% endif %}
+{% if item.fields_under_root is defined %}
+    fields_under_root: {{ item.fields_under_root }}
+{% endif %}
+{% endfor %}
+
+output.logstash:
+  hosts: {{ filebeat_output_logstash.hosts }}
+  worker: {{ filebeat_output_logstash.worker }}
+{% if filebeat_output_logstash.index is defined %}
+  index: "{{ filebeat_output_logstash.index }}"
+{% endif %}
+
+setup.kibana:
+  host: "{{ filebeat_setup_kibana.host }}"
+
+setup.template.settings:
+  index.number_of_shards: {{ filebeat_setup_template_settings.index_number_of_shards }}
+
+{% if filebeat_logging is defined %}
+logging: {{ filebeat_logging }}
+{% else %}
+logging.level: "{{ filebeat_logging_level }}"
+{% endif %}
+
+{% if filebeat_processors_drop_fields is defined %}
+processors:
+  - drop_fields
+      fields: ["{{ filebeat_processors_drop_fields | join('", "') }}"]
+{% endif %}
