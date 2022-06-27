@@ -3,7 +3,7 @@
 Provision an [Elastic Stack](https://www.elastic.co/elastic-stack/)
 cluster on Ubuntu 22.04 LTS using [Vagrant](https://www.vagrantup.com/),
 [Virtualbox](https://www.virtualbox.org/) and
-[Ansible](https://docs.ansible.com/ansible/latest/).  T
+[Ansible](https://docs.ansible.com/ansible/latest/).
 
 ## Clone the GitHub Repository
 
