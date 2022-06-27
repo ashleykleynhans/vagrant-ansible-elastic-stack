@@ -1,0 +1,45 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Include task to install packages that enable apt over HTTPS
+      ansible.builtin.include_tasks: includes/apt_over_https.yml
+
+    - name: Include task to install useful packages
+      ansible.builtin.include_tasks: includes/install_useful_packages.yml
+
+    - name: Include task to install Elastic Stack
+      ansible.builtin.include_tasks: includes/install_elastic_stack.yml
+
+    - name: Include task to install nginx
+      ansible.builtin.include_tasks: includes/install_nginx.yml
+
+  handlers:
+    - name: restart elasticsearch
+      ansible.builtin.systemd:
+        name: elasticsearch
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+    - name: restart kibana
+      ansible.builtin.systemd:
+        name: kibana
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+    - name: restart logstash
+      ansible.builtin.systemd:
+        name: logstash
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+    - name: restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

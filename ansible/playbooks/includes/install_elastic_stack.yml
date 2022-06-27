@@ -1,0 +1,50 @@
+---
+- name: Install OpenJDK 11
+  ansible.builtin.apt:
+    name: default-jre
+    state: present
+#
+#- name: Add an apt signing key for Elastic
+#  ansible.builtin.shell: >-
+#    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch |
+#    gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+#
+#- name: Add apt repository for Elastic
+#  ansible.builtin.apt_repository:
+#    repo: deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main
+#    state: present
+
+- name: Install Elasticsearch
+  ansible.builtin.apt:
+    name: elasticsearch
+    state: present
+    update_cache: yes
+  notify: restart elasticsearch
+
+- name: Install Kibana
+  ansible.builtin.apt:
+    name: kibana
+    state: present
+    update_cache: yes
+  notify: restart kibana
+
+- name: Install Logstash
+  ansible.builtin.apt:
+    name: logstash
+    state: present
+    update_cache: yes
+  notify: restart logstash
+
+- name: Configure Logstash Beats Input
+  ansible.builtin.copy:
+    src: ../files/02-beats-input.conf
+    dest: /etc/logstash/conf.d/02-beats-input.conf
+    mode: 0644
+  notify: restart logstash
+
+- name: Configure Logstash Elasticsearch Output
+  ansible.builtin.copy:
+    src: ../files/30-elasticsearch-output.conf
+    dest: /etc/logstash/conf.d/30-elasticsearch-output.conf
+    mode: 0644
+  notify: restart logstash
