@@ -16,8 +16,8 @@ Vagrant.configure("2") do |config|
         config.vm.define "elk-#{server_id}" do |node|
             node.vm.provider "virtualbox" do |vb|
                 vb.name = "elk-#{server_id}"
-                vb.memory = 4096
-                vb.cpus = 2
+                vb.memory = 2048
+                vb.cpus = 1
                 vb.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
             end
             node.vm.hostname = "elk-#{server_id}"

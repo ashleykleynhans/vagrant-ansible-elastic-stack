@@ -5,9 +5,10 @@
     state: present
 
 - name: Add an apt signing key for Elastic
-  ansible.builtin.shell: >-
-    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch |
-    gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+  ansible.builtin.apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+    keyring: /usr/share/keyrings/elastic.gpg
 
 - name: Add apt repository for Elastic
   ansible.builtin.apt_repository:
